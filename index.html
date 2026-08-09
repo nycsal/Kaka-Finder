@@ -1,1 +1,1248 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Kaka Finder</title>
+<!-- Barcode / QR scanner -->
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<!-- QR code generator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+    --purple: #7c3aed;
+    --pink: #ec4899;
+    --orange: #f97316;
+    --yellow: #facc15;
+    --blue: #0ea5e9;
+    --green: #22c55e;
+    --red: #ef4444;
+    --dark: #172033;
+    --gray: #64748b;
+    --light: #f8fafc;
+    --white: #ffffff;
+    --border: #e2e8f0;
+}
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+        radial-gradient(circle at top left, #fce7f3 0, transparent 28%),
+        radial-gradient(circle at top right, #dbeafe 0, transparent 30%),
+        #f8fafc;
+    color: var(--dark);
+}
+.app {
+    max-width: 650px;
+    margin: auto;
+    min-height: 100vh;
+    padding-bottom: 90px;
+}
+/* HEADER */
+.header {
+    padding: 25px 20px 18px;
+    background: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
+    color: white;
+    border-radius: 0 0 30px 30px;
+    box-shadow: 0 8px 25px rgba(124,58,237,.25);
+}
+.logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo-icon {
+    width: 54px;
+    height: 54px;
+    background: white;
+    color: var(--purple);
+    border-radius: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.15);
+}
+.logo h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+.logo small {
+    display: block;
+    opacity: .9;
+    font-size: 12px;
+    margin-top: 2px;
+}
+.header-count {
+    text-align: right;
+}
+.header-count strong {
+    display: block;
+    font-size: 26px;
+}
+.header-count span {
+    font-size: 11px;
+    opacity: .85;
+}
+/* CONTENT */
+.content {
+    padding: 18px;
+}
+.search {
+    width: 100%;
+    border: none;
+    background: white;
+    border-radius: 18px;
+    padding: 16px 18px;
+    font-size: 16px;
+    outline: none;
+    box-shadow: 0 3px 15px rgba(15,23,42,.08);
+    margin-bottom: 16px;
+}
+/* BUTTONS */
+.button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.btn {
+    border: none;
+    border-radius: 18px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .12s;
+}
+.btn:active {
+    transform: scale(.97);
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    color: white;
+    box-shadow: 0 7px 18px rgba(124,58,237,.25);
+}
+.btn-secondary {
+    background: white;
+    color: var(--dark);
+    box-shadow: 0 3px 15px rgba(15,23,42,.08);
+}
+.btn-green {
+    background: var(--green);
+    color: white;
+}
+.btn-red {
+    background: var(--red);
+    color: white;
+}
+/* ITEM CARDS */
+.item-card {
+    background: white;
+    border-radius: 22px;
+    margin-bottom: 14px;
+    padding: 15px;
+    box-shadow: 0 4px 18px rgba(15,23,42,.07);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+.item-photo {
+    width: 82px;
+    height: 82px;
+    border-radius: 17px;
+    object-fit: cover;
+    background: linear-gradient(135deg,#ddd6fe,#fbcfe8);
+    flex-shrink: 0;
+}
+.item-info {
+    min-width: 0;
+    flex: 1;
+}
+.item-name {
+    font-weight: 900;
+    font-size: 17px;
+    margin-bottom: 4px;
+}
+.item-brand {
+    color: var(--purple);
+    font-size: 13px;
+    font-weight: 700;
+}
+.item-location {
+    margin-top: 7px;
+    font-size: 13px;
+    color: var(--gray);
+}
+.item-location::before {
+    content: "📍 ";
+}
+.item-date {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+.item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.icon-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 12px;
+    background: #f1f5f9;
+    font-size: 17px;
+    cursor: pointer;
+}
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 55px 25px;
+    color: var(--gray);
+}
+.empty-icon {
+    font-size: 65px;
+    margin-bottom: 12px;
+}
+.empty h2 {
+    color: var(--dark);
+    margin: 5px 0;
+}
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    background: rgba(15,23,42,.65);
+    padding: 15px;
+    overflow-y: auto;
+}
+.modal-box {
+    background: white;
+    max-width: 600px;
+    margin: 15px auto;
+    border-radius: 27px;
+    padding: 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+.modal-header h2 {
+    margin: 0;
+    font-size: 23px;
+}
+.close {
+    border: none;
+    background: #f1f5f9;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 20px;
+}
+/* FORMS */
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--gray);
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+input, textarea, select {
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    font-size: 16px;
+    background: white;
+    outline: none;
+    font-family: inherit;
+}
+input:focus, textarea:focus, select:focus {
+    border-color: var(--purple);
+}
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+/* CAMERA */
+#reader {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 20px;
+    margin-bottom: 15px;
+}
+.scanner-help {
+    background: #f1f5f9;
+    padding: 12px;
+    border-radius: 14px;
+    font-size: 13px;
+    color: var(--gray);
+    text-align: center;
+}
+/* PHOTO */
+.photo-area {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+.preview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 17px;
+    background: #f1f5f9;
+    display: none;
+}
+/* QR */
+.qr-area {
+    text-align: center;
+    padding: 15px;
+}
+#qrcode {
+    display: inline-block;
+    margin: 10px auto;
+}
+/* SETTINGS */
+.settings-card {
+    background: white;
+    border-radius: 22px;
+    padding: 18px;
+    margin-top: 18px;
+    box-shadow: 0 4px 18px rgba(15,23,42,.07);
+}
+.settings-card h3 {
+    margin-top: 0;
+}
+.small {
+    color: var(--gray);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.file-label {
+    display: block;
+    background: #f1f5f9;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 700;
+    margin-top: 10px;
+}
+.file-label input {
+    display: none;
+}
+/* TOAST */
+.toast {
+    position: fixed;
+    z-index: 500;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #172033;
+    color: white;
+    padding: 13px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: .3s;
+    opacity: 0;
+    max-width: 90%;
+    text-align: center;
+}
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+/* RESPONSIVE */
+@media (max-width: 420px) {
+    .content {
+        padding: 14px;
+    }
+    .item-photo {
+        width: 70px;
+        height: 70px;
+    }
+    .logo h1 {
+        font-size: 25px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="app">
+    <header class="header">
+        <div class="logo-row">
+            <div class="logo">
+                <div class="logo-icon">🔎</div>
+                <div>
+                    <h1>Kaka Finder</h1>
+                    <small>Find where you put EVERYTHING.</small>
+                </div>
+            </div>
+            <div class="header-count">
+                <strong id="itemCount">0</strong>
+                <span>ITEMS</span>
+            </div>
+        </div>
+    </header>
+    <main class="content">
+        <input
+            id="search"
+            class="search"
+            type="search"
+            placeholder="🔍 Search items, locations, brands..."
+        >
+        <div class="button-row">
+            <button class="btn btn-primary" onclick="openScanner()">
+                📷 Scan Item
+            </button>
+            <button class="btn btn-secondary" onclick="openManual()">
+                ➕ Add Manually
+            </button>
+        </div>
+        <div id="items"></div>
+        <div class="settings-card">
+            <h3>💾 Your Finder Data</h3>
+            <p class="small">
+                Your inventory is stored only on this phone/browser.
+                Nothing is sent to a Kaka Finder server.
+            </p>
+            <button class="btn btn-secondary" style="width:100%; margin-top:8px"
+                    onclick="exportData()">
+                📤 Backup Inventory
+            </button>
+            <label class="file-label">
+                📥 Restore Inventory
+                <input type="file" id="importFile" accept=".json"
+                       onchange="importData(event)">
+            </label>
+            <button class="btn btn-red"
+                    style="width:100%; margin-top:10px"
+                    onclick="clearAll()">
+                🗑️ Delete All Inventory
+            </button>
+        </div>
+    </main>
+</div>
+<!-- SCANNER MODAL -->
+<div class="modal" id="scannerModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>📷 Scan Item</h2>
+            <button class="close" onclick="closeScanner()">✕</button>
+        </div>
+        <div id="reader"></div>
+        <div class="scanner-help">
+            Point your camera at a barcode or QR code.
+            <br><br>
+            <strong>Kaka Finder will automatically recognize an item
+            you've already scanned.</strong>
+        </div>
+        <button class="btn btn-secondary"
+                style="width:100%; margin-top:15px"
+                onclick="closeScanner()">
+            Cancel
+        </button>
+    </div>
+</div>
+<!-- ITEM FORM MODAL -->
+<div class="modal" id="formModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 id="formTitle">📦 New Item</h2>
+            <button class="close" onclick="closeForm()">✕</button>
+        </div>
+        <form id="itemForm">
+            <input type="hidden" id="editId">
+            <input type="hidden" id="barcode">
+            <label>Item Name *</label>
+            <input id="itemName"
+                   placeholder="Example: Outdoor Speaker"
+                   required>
+            <label>Brand</label>
+            <input id="brand"
+                   placeholder="Example: JBL, Sony, Apple...">
+            <label>Location *</label>
+            <select id="locationPreset"
+                    onchange="applyLocationPreset()">
+                <option value="">Choose a location...</option>
+                <option>Living Room</option>
+                <option>Living Room Closet</option>
+                <option>Bedroom</option>
+                <option>Bedroom Closet</option>
+                <option>Kitchen</option>
+                <option>Dining Room</option>
+                <option>Office</option>
+                <option>Garage</option>
+                <option>Basement</option>
+                <option>Attic</option>
+                <option>Shed</option>
+                <option>Storage Room</option>
+                <option>Car</option>
+                <option>Other</option>
+            </select>
+            <input id="location"
+                   style="margin-top:8px"
+                   placeholder="Example: 3rd shelf, blue bin">
+            <label>Photo</label>
+            <div class="photo-area">
+                <img id="preview" class="preview">
+                <div style="flex:1">
+                    <label class="file-label" style="margin:0">
+                        📸 Take / Choose Photo
+                        <input type="file"
+                               id="photo"
+                               accept="image/*"
+                               capture="environment">
+                    </label>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            style="width:100%; margin-top:8px"
+                            onclick="removePhoto()">
+                        Remove Photo
+                    </button>
+                </div>
+            </div>
+            <label>Notes</label>
+            <textarea id="notes"
+                      placeholder="Anything else you want to remember..."></textarea>
+            <label>Barcode / QR ID</label>
+            <input id="barcodeDisplay"
+                   readonly
+                   placeholder="No barcode">
+            <div class="button-row" style="margin-top:20px">
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="closeForm()">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="btn btn-primary">
+                    💾 Save Item
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- ITEM DETAIL MODAL -->
+<div class="modal" id="detailModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>📦 Item Details</h2>
+            <button class="close" onclick="closeDetail()">✕</button>
+        </div>
+        <div id="detailContent"></div>
+    </div>
+</div>
+<!-- QR MODAL -->
+<div class="modal" id="qrModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2>🏷️ Item QR Code</h2>
+            <button class="close" onclick="closeQR()">✕</button>
+        </div>
+        <div class="qr-area">
+            <p id="qrDescription"></p>
+            <div id="qrcode"></div>
+            <p class="small">
+                Print this QR code and stick it on the item.
+                Next time, scan it with Kaka Finder.
+            </p>
+            <button class="btn btn-primary"
+                    style="width:100%"
+                    onclick="window.print()">
+                🖨️ Print QR Code
+            </button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/* ============================================================
+   KAKA FINDER
+   Local Inventory Manager
+   ============================================================ */
+let items = [];
+let scanner = null;
+let currentPhoto = null;
+/* ============================================================
+   STORAGE
+   ============================================================ */
+function loadItems() {
+    try {
+        const saved = localStorage.getItem("kakaFinderItems");
+        if (saved) {
+            items = JSON.parse(saved);
+        }
+    } catch (error) {
+        console.error(error);
+        items = [];
+    }
+    renderItems();
+}
+function saveItems() {
+    try {
+        localStorage.setItem(
+            "kakaFinderItems",
+            JSON.stringify(items)
+        );
+    } catch (error) {
+        alert(
+            "Kaka Finder couldn't save the photo. " +
+            "Your browser may be running out of storage. " +
+            "Try using a smaller photo."
+        );
+        console.error(error);
+    }
+    updateCount();
+}
+/* ============================================================
+   UI
+   ============================================================ */
+function updateCount() {
+    document.getElementById("itemCount").textContent = items.length;
+}
+function toast(message) {
+    const el = document.getElementById("toast");
+    el.textContent = message;
+    el.classList.add("show");
+    setTimeout(() => {
+        el.classList.remove("show");
+    }, 2500);
+}
+/* ============================================================
+   RENDER ITEMS
+   ============================================================ */
+function renderItems() {
+    const container = document.getElementById("items");
+    const search = document
+        .getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+    container.innerHTML = "";
+    let filtered = items.filter(item => {
+        const text = `
+            ${item.name}
+            ${item.brand}
+            ${item.location}
+            ${item.notes}
+            ${item.barcode}
+        `.toLowerCase();
+        return text.includes(search);
+    });
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">
+                    ${search ? "🔎" : "📦"}
+                </div>
+                <h2>
+                    ${search ? "Nothing found" : "Your Finder is empty"}
+                </h2>
+                <p>
+                    ${
+                        search
+                        ? "Try another search."
+                        : "Scan your first item and Kaka Finder will remember where you put it."
+                    }
+                </p>
+            </div>
+        `;
+        updateCount();
+        return;
+    }
+    filtered
+        .sort((a,b) => new Date(b.date) - new Date(a.date))
+        .forEach(item => {
+            const card = document.createElement("div");
+            card.className = "item-card";
+            let photo = item.photo ||
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100%25' height='100%25' fill='%23ede9fe'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='42'%3E📦%3C/text%3E%3C/svg%3E";
+            card.innerHTML = `
+                <img class="item-photo" src="${photo}">
+                <div class="item-info">
+                    <div class="item-name">
+                        ${escapeHtml(item.name)}
+                    </div>
+                    ${
+                        item.brand
+                        ? `<div class="item-brand">
+                            ${escapeHtml(item.brand)}
+                           </div>`
+                        : ""
+                    }
+                    <div class="item-location">
+                        ${escapeHtml(item.location)}
+                    </div>
+                    <div class="item-date">
+                        Added ${formatDate(item.date)}
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="icon-btn"
+                            onclick="viewItem('${item.id}')">
+                        👁️
+                    </button>
+                    <button class="icon-btn"
+                            onclick="editItem('${item.id}')">
+                        ✏️
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    updateCount();
+}
+/* ============================================================
+   SEARCH
+   ============================================================ */
+document.getElementById("search")
+    .addEventListener("input", renderItems);
+/* ============================================================
+   SCANNER
+   ============================================================ */
+function openScanner() {
+    document.getElementById("scannerModal")
+        .style.display = "block";
+    scanner = new Html5Qrcode("reader");
+    const config = {
+        fps: 10,
+        qrbox: {
+            width: 250,
+            height: 150
+        },
+        aspectRatio: 1.0
+    };
+    scanner.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess,
+        onScanError
+    ).catch(error => {
+        console.error(error);
+        alert(
+            "Kaka Finder couldn't access your camera.\n\n" +
+            "Make sure camera permission is allowed for this website."
+        );
+    });
+}
+function onScanSuccess(decodedText) {
+    if (!decodedText) return;
+    stopScanner();
+    const existing = items.find(
+        item => item.barcode === decodedText
+    );
+    if (existing) {
+        toast("🎯 Found your item!");
+        setTimeout(() => {
+            viewItem(existing.id);
+        }, 400);
+        return;
+    }
+    openNewItem(decodedText);
+}
+function onScanError(error) {
+    // Scanner continuously generates "not found" messages.
+    // We intentionally don't display them.
+}
+function stopScanner() {
+    if (scanner) {
+        scanner.stop()
+            .then(() => {
+                scanner.clear();
+            })
+            .catch(() => {});
+        scanner = null;
+    }
+}
+function closeScanner() {
+    stopScanner();
+    document.getElementById("scannerModal")
+        .style.display = "none";
+}
+/* ============================================================
+   NEW ITEM
+   ============================================================ */
+function openNewItem(barcode = "") {
+    currentPhoto = null;
+    document.getElementById("formTitle")
+        .textContent = "📦 New Item";
+    document.getElementById("editId").value = "";
+    document.getElementById("barcode").value = barcode;
+    document.getElementById("barcodeDisplay").value =
+        barcode || "Manual item";
+    document.getElementById("itemName").value = "";
+    document.getElementById("brand").value = "";
+    document.getElementById("location").value = "";
+    document.getElementById("locationPreset").value = "";
+    document.getElementById("notes").value = "";
+    document.getElementById("photo").value = "";
+    document.getElementById("preview").style.display = "none";
+    document.getElementById("formModal")
+        .style.display = "block";
+}
+function openManual() {
+    openNewItem("");
+}
+function closeForm() {
+    document.getElementById("formModal")
+        .style.display = "none";
+}
+/* ============================================================
+   LOCATION PRESETS
+   ============================================================ */
+function applyLocationPreset() {
+    const preset =
+        document.getElementById("locationPreset").value;
+    if (!preset) return;
+    const location =
+        document.getElementById("location");
+    if (!location.value) {
+        location.value = preset;
+    } else {
+        location.value =
+            preset + " — " + location.value;
+    }
+    location.focus();
+}
+/* ============================================================
+   PHOTO
+   ============================================================ */
+document.getElementById("photo")
+    .addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            currentPhoto = event.target.result;
+            const preview =
+                document.getElementById("preview");
+            preview.src = currentPhoto;
+            preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    });
+function removePhoto() {
+    currentPhoto = null;
+    document.getElementById("photo").value = "";
+    document.getElementById("preview")
+        .style.display = "none";
+}
+/* ============================================================
+   SAVE ITEM
+   ============================================================ */
+document.getElementById("itemForm")
+    .addEventListener("submit", function(e) {
+        e.preventDefault();
+        const id =
+            document.getElementById("editId").value;
+        const name =
+            document.getElementById("itemName").value.trim();
+        const brand =
+            document.getElementById("brand").value.trim();
+        const location =
+            document.getElementById("location").value.trim();
+        const barcode =
+            document.getElementById("barcode").value.trim();
+        const notes =
+            document.getElementById("notes").value.trim();
+        if (!name || !location) {
+            alert(
+                "Please enter an item name and location."
+            );
+            return;
+        }
+        /* Prevent duplicate barcodes */
+        if (barcode) {
+            const duplicate = items.find(item =>
+                item.barcode === barcode &&
+                item.id !== id
+            );
+            if (duplicate) {
+                alert(
+                    "That barcode already belongs to:\n\n" +
+                    duplicate.name
+                );
+                return;
+            }
+        }
+        if (id) {
+            const index =
+                items.findIndex(item => item.id === id);
+            if (index !== -1) {
+                items[index] = {
+                    ...items[index],
+                    name,
+                    brand,
+                    location,
+                    barcode,
+                    notes,
+                    photo:
+                        currentPhoto !== null
+                        ? currentPhoto
+                        : items[index].photo
+                };
+            }
+            toast("✏️ Item updated!");
+        } else {
+            const newItem = {
+                id:
+                    Date.now().toString(36) +
+                    Math.random().toString(36).substring(2),
+                name,
+                brand,
+                location,
+                barcode,
+                notes,
+                photo: currentPhoto,
+                date: new Date().toISOString()
+            };
+            items.push(newItem);
+            toast("🎉 Item saved!");
+        }
+        saveItems();
+        closeForm();
+        renderItems();
+    });
+/* ============================================================
+   EDIT
+   ============================================================ */
+function editItem(id) {
+    const item =
+        items.find(item => item.id === id);
+    if (!item) return;
+    currentPhoto = item.photo || null;
+    document.getElementById("formTitle")
+        .textContent = "✏️ Edit Item";
+    document.getElementById("editId").value =
+        item.id;
+    document.getElementById("barcode").value =
+        item.barcode || "";
+    document.getElementById("barcodeDisplay").value =
+        item.barcode || "Manual item";
+    document.getElementById("itemName").value =
+        item.name || "";
+    document.getElementById("brand").value =
+        item.brand || "";
+    document.getElementById("location").value =
+        item.location || "";
+    document.getElementById("locationPreset").value =
+        "";
+    document.getElementById("notes").value =
+        item.notes || "";
+    const preview =
+        document.getElementById("preview");
+    if (item.photo) {
+        preview.src = item.photo;
+        preview.style.display = "block";
+    } else {
+        preview.style.display = "none";
+    }
+    document.getElementById("formModal")
+        .style.display = "block";
+}
+/* ============================================================
+   VIEW ITEM
+   ============================================================ */
+function viewItem(id) {
+    const item =
+        items.find(item => item.id === id);
+    if (!item) return;
+    let html = "";
+    if (item.photo) {
+        html += `
+            <img src="${item.photo}"
+                 style="
+                    width:100%;
+                    max-height:300px;
+                    object-fit:contain;
+                    border-radius:20px;
+                    background:#f1f5f9;
+                    margin-bottom:18px;
+                 ">
+        `;
+    }
+    html += `
+        <h2 style="margin:0 0 5px">
+            ${escapeHtml(item.name)}
+        </h2>
+        ${
+            item.brand
+            ? `<div style="
+                    color:#7c3aed;
+                    font-weight:800;
+                    margin-bottom:15px;">
+                    ${escapeHtml(item.brand)}
+               </div>`
+            : ""
+        }
+        <div style="
+            background:#f8fafc;
+            padding:15px;
+            border-radius:17px;
+            margin-bottom:12px;">
+            <strong>📍 Location</strong>
+            <div style="
+                font-size:17px;
+                margin-top:5px;">
+                ${escapeHtml(item.location)}
+            </div>
+        </div>
+        ${
+            item.barcode
+            ? `<div style="
+                    background:#f8fafc;
+                    padding:15px;
+                    border-radius:17px;
+                    margin-bottom:12px;">
+                    <strong>🏷️ Barcode / QR</strong>
+                    <div style="word-break:break-all;
+                                margin-top:5px;">
+                        ${escapeHtml(item.barcode)}
+                    </div>
+               </div>`
+            : ""
+        }
+        ${
+            item.notes
+            ? `<div style="
+                    background:#f8fafc;
+                    padding:15px;
+                    border-radius:17px;
+                    margin-bottom:12px;">
+                    <strong>📝 Notes</strong>
+                    <div style="margin-top:5px;">
+                        ${escapeHtml(item.notes)}
+                    </div>
+               </div>`
+            : ""
+        }
+        <div class="small">
+            Added: ${formatDate(item.date)}
+        </div>
+        <div class="button-row" style="margin-top:20px">
+            <button class="btn btn-primary"
+                    onclick="editItem('${item.id}'); closeDetail()">
+                ✏️ Edit
+            </button>
+            <button class="btn btn-secondary"
+                    onclick="generateQR('${item.id}')">
+                🏷️ QR Code
+            </button>
+        </div>
+        <button class="btn btn-red"
+                style="width:100%"
+                onclick="deleteItem('${item.id}')">
+            🗑️ Delete Item
+        </button>
+    `;
+    document.getElementById("detailContent")
+        .innerHTML = html;
+    document.getElementById("detailModal")
+        .style.display = "block";
+}
+function closeDetail() {
+    document.getElementById("detailModal")
+        .style.display = "none";
+}
+/* ============================================================
+   DELETE
+   ============================================================ */
+function deleteItem(id) {
+    const item =
+        items.find(item => item.id === id);
+    if (!item) return;
+    if (!confirm(
+        `Delete "${item.name}" from Kaka Finder?`
+    )) return;
+    items =
+        items.filter(item => item.id !== id);
+    saveItems();
+    closeDetail();
+    renderItems();
+    toast("🗑️ Item deleted");
+}
+/* ============================================================
+   QR GENERATOR
+   ============================================================ */
+function generateQR(id) {
+    const item =
+        items.find(item => item.id === id);
+    if (!item) return;
+    let qrValue = item.barcode;
+    /*
+       Manual items don't have a manufacturer barcode.
+       Give them a unique Kaka Finder ID.
+    */
+    if (!qrValue) {
+        qrValue = "KAKA-" + item.id;
+        item.barcode = qrValue;
+        saveItems();
+        renderItems();
+    }
+    document.getElementById("qrcode")
+        .innerHTML = "";
+    new QRCode(
+        document.getElementById("qrcode"),
+        {
+            text: qrValue,
+            width: 220,
+            height: 220,
+            correctLevel: QRCode.CorrectLevel.H
+        }
+    );
+    document.getElementById("qrDescription")
+        .innerHTML =
+        `<strong>${escapeHtml(item.name)}</strong><br>
+         ${escapeHtml(item.location)}`;
+    document.getElementById("qrModal")
+        .style.display = "block";
+}
+function closeQR() {
+    document.getElementById("qrModal")
+        .style.display = "none";
+}
+/* ============================================================
+   EXPORT
+   ============================================================ */
+function exportData() {
+    if (!items.length) {
+        alert("There are no items to back up yet.");
+        return;
+    }
+    const data = {
+        app: "Kaka Finder",
+        version: 1,
+        exported:
+            new Date().toISOString(),
+        items
+    };
+    const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        {type:"application/json"}
+    );
+    const url =
+        URL.createObjectURL(blob);
+    const a =
+        document.createElement("a");
+    a.href = url;
+    a.download =
+        "Kaka-Finder-Backup-" +
+        new Date().toISOString().slice(0,10) +
+        ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("📤 Backup created!");
+}
+/* ============================================================
+   IMPORT
+   ============================================================ */
+function importData(event) {
+    const file =
+        event.target.files[0];
+    if (!file) return;
+    const reader =
+        new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data =
+                JSON.parse(e.target.result);
+            if (!data.items ||
+                !Array.isArray(data.items)) {
+                throw new Error("Invalid backup");
+            }
+            if (!confirm(
+                "Restore this backup?\n\n" +
+                "This will replace the inventory currently on this browser."
+            )) return;
+            items = data.items;
+            saveItems();
+            renderItems();
+            toast("📥 Inventory restored!");
+        } catch(error) {
+            alert(
+                "That file doesn't look like a valid Kaka Finder backup."
+            );
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+}
+/* ============================================================
+   DELETE EVERYTHING
+   ============================================================ */
+function clearAll() {
+    if (!items.length) return;
+    const answer =
+        prompt(
+            "This will permanently delete every item.\n\n" +
+            "Type DELETE to confirm:"
+        );
+    if (answer !== "DELETE") return;
+    items = [];
+    saveItems();
+    renderItems();
+    toast("Everything has been deleted.");
+}
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function formatDate(date) {
+    return new Date(date).toLocaleString(
+        undefined,
+        {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        }
+    );
+}
+function escapeHtml(text) {
+    if (text === undefined ||
+        text === null) return "";
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+/* ============================================================
+   START
+   ============================================================ */
+loadItems();
+/* ============================================================
+   PREVENT ACCIDENTAL MODAL CLOSING
+   ============================================================ */
+window.addEventListener("beforeunload", function() {
+    stopScanner();
+});
+</script>
+</body>
+</html>
